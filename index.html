@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif Sederhana - Favian Zufar Niardi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-white text-zinc-900 min-h-screen flex flex-col justify-between selection:bg-zinc-900 selection:text-white">
+
+    <!-- Header / Identitas Proyek (shadcn style) -->
+    <header class="w-full border-b border-zinc-200 bg-white/80 backdrop-blur-md py-4 px-6 sticky top-0 z-50">
+        <div class="max-w-3xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 rounded-lg bg-zinc-900 text-white flex items-center justify-center font-bold text-sm tracking-tighter shadow-sm">
+                    KI
+                </div>
+                <div>
+                    <h1 class="font-semibold text-sm tracking-tight text-zinc-900">Kuis Interaktif Sederhana</h1>
+                    <p class="text-xs text-zinc-500">Oleh: <span class="font-medium text-zinc-800">Favian Zufar Niardi</span> (XI TKJT 1)</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 bg-zinc-100 border border-zinc-200 px-3 py-1.5 rounded-md text-xs text-zinc-700 font-medium">
+                <span class="w-2 h-2 rounded-full bg-zinc-900 animate-pulse"></span>
+                <span>AWS S3 Static Hosting</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Konten Utama (State-Driven 4 Kuadran) -->
+    <main class="flex-grow flex items-center justify-center p-4 sm:p-6">
+        <div class="w-full max-w-xl bg-white border border-zinc-200 rounded-xl shadow-sm p-6 sm:p-8 transition-all duration-200">
+            
+            <!-- KUADRAN 1: Initial State (Tampilan Awal) -->
+            <div id="view-initial" class="space-y-6 text-center py-2">
+                <div class="inline-flex p-3 rounded-xl bg-zinc-100 border border-zinc-200 text-zinc-900 mb-1 shadow-xs">
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                </div>
+                
+                <div class="space-y-2">
+                    <h2 class="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Uji Pemahaman Materi Mandiri</h2>
+                    <p class="text-xs sm:text-sm text-zinc-500 max-w-md mx-auto leading-relaxed">
+                        Solusi praktis mengatasi kendala latihan soal yang membosankan. Kuis interaktif berbasis cloud computing dengan evaluasi skor real-time.
+                    </p>
+                </div>
+
+                <div class="bg-zinc-50 border border-zinc-200 rounded-lg p-4 text-left max-w-md mx-auto space-y-2 text-xs sm:text-sm text-zinc-600">
+                    <div class="flex items-center gap-2 font-medium text-zinc-900">
+                        <svg class="w-4 h-4 text-zinc-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        <span>Informasi Kuis:</span>
+                    </div>
+                    <ul class="list-disc list-inside space-y-1 text-zinc-500 pl-1">
+                        <li>Total Soal: 5 Pertanyaan Pilihan Ganda</li>
+                        <li>Materi: Cloud Computing & Jaringan Dasar</li>
+                        <li>Evaluasi: Skor Otomatis & Analisis Jawaban</li>
+                    </ul>
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="startQuiz()" class="w-full sm:w-auto px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-sm rounded-lg shadow-xs transition-all duration-150 cursor-pointer">
+                        Mulai Kuis
+                    </button>
+                </div>
+            </div>
+
+            <!-- KUADRAN 2 & 3: Trigger & Action (Tampilan Soal & Interaksi) -->
+            <div id="view-quiz" class="hidden space-y-6">
+                <!-- Progress & Info Soal -->
+                <div class="flex justify-between items-center text-xs sm:text-sm font-medium text-zinc-500 border-b border-zinc-200 pb-4">
+                    <span id="question-counter" class="text-zinc-900 font-semibold">Soal 1 dari 5</span>
+                    <div class="flex items-center gap-2">
+                        <span>Skor:</span>
+                        <span id="current-score" class="px-2 py-0.5 bg-zinc-100 border border-zinc-200 rounded-md text-zinc-900 font-semibold">0</span>
+                    </div>
+                </div>
+
+                <!-- Pertanyaan -->
+                <div class="space-y-2">
+                    <h3 id="question-text" class="text-base sm:text-lg font-semibold text-zinc-900 leading-snug">
+                        <!-- Teks soal dimuat dinamis via JS -->
+                    </h3>
+                </div>
+
+                <!-- Pilihan Jawaban -->
+                <div id="options-container" class="space-y-2.5">
+                    <!-- Tombol pilihan opsi dimuat dinamis via JS -->
+                </div>
+
+                <!-- Tombol Navigasi Lanjut -->
+                <div id="nav-container" class="pt-2 flex justify-end hidden">
+                    <button id="next-btn" onclick="nextQuestion()" class="px-5 py-2 bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-sm rounded-lg shadow-xs transition-all duration-150 cursor-pointer flex items-center gap-1.5">
+                        <span>Selanjutnya</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KUADRAN 4: Termination State (Tampilan Hasil Akhir) -->
+            <div id="view-result" class="hidden space-y-6 text-center py-2">
+                <div class="inline-flex p-3.5 rounded-xl bg-zinc-100 border border-zinc-200 text-zinc-900 mb-1">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+
+                <div class="space-y-1.5">
+                    <h2 class="text-xl sm:text-2xl font-bold text-zinc-900 tracking-tight">Kuis Selesai</h2>
+                    <p class="text-xs sm:text-sm text-zinc-500">Berikut adalah rekapitulasi hasil evaluasi mandiri Anda.</p>
+                </div>
+
+                <!-- Ringkasan Statistik -->
+                <div class="bg-zinc-50 border border-zinc-200 rounded-xl p-5 max-w-sm mx-auto space-y-4">
+                    <div>
+                        <span class="text-[11px] uppercase tracking-wider text-zinc-400 font-semibold">Skor Total</span>
+                        <div id="final-score" class="text-3xl sm:text-4xl font-bold text-zinc-900 mt-1">100</div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-zinc-200 text-xs sm:text-sm">
+                        <div class="bg-white p-2.5 rounded-lg border border-zinc-200">
+                            <span class="block text-zinc-400 text-[11px]">Benar</span>
+                            <span id="correct-count" class="text-base font-semibold text-zinc-900">5</span>
+                        </div>
+                        <div class="bg-white p-2.5 rounded-lg border border-zinc-200">
+                            <span class="block text-zinc-400 text-[11px]">Salah</span>
+                            <span id="incorrect-count" class="text-base font-semibold text-zinc-900">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pesan Motivasi -->
+                <div id="motivation-message" class="text-xs sm:text-sm font-medium text-zinc-700 bg-zinc-100 border border-zinc-200 rounded-lg p-3 max-w-sm mx-auto">
+                    <!-- Pesan motivasi dinamis -->
+                </div>
+
+                <div class="pt-2">
+                    <button onclick="restartQuiz()" class="w-full sm:w-auto px-6 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-sm rounded-lg shadow-xs transition-all duration-150 cursor-pointer">
+                        Ulangi Kuis
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs text-zinc-400 border-t border-zinc-200">
+        <p>&copy; 2026 Favian Zufar Niardi (XI TKJT 1) &bull; Website Kuis Interaktif Sederhana Berbasis AWS S3</p>
+    </footer>
+
+    <!-- JavaScript Logika Aplikasi (State-Driven) -->
+    <script>
+        // Data Soal Berdasarkan Materi Proyek
+        const quizData = [
+            {
+                question: "Apa tujuan utama dari pengembangan aplikasi 'Website Kuis Interaktif Sederhana' ini?",
+                options: [
+                    "Membuat media latihan soal sekolah yang membosankan",
+                    "Menyediakan kuis cepat, praktis, dan langsung menampilkan skor evaluasi mandiri",
+                    "Menggantikan seluruh kegiatan belajar tatap muka di kelas",
+                    "Membuat sistem operasi jaringan komputer baru"
+                ],
+                correct: 1
+            },
+            {
+                question: "Layanan apakah yang digunakan untuk melakukan deployment file statis situs web kuis ini pada arsitektur cloud?",
+                options: [
+                    "Amazon S3 (Static Website Hosting)",
+                    "Localhost Server Offline",
+                    "Bluetooth File Transfer",
+                    "Database SQL Server Enterprise"
+                ],
+                correct: 0
+            },
+            {
+                question: "Siapakah nama pembuat atau penulis proyek penelitian aplikasi kuis interaktif ini?",
+                options: [
+                    "Favian Zufar Niardi",
+                    "Ahmad Junaedi",
+                    "Rian Pratama",
+                    "Dimas Setiawan"
+                ],
+                correct: 0
+            },
+            {
+                question: "Apa masalah utama yang sering dihadapi siswa dalam menguji pemahaman materi sekolah secara mandiri?",
+                options: [
+                    "Media latihan yang ada membosankan, tidak praktis, dan membingungkan",
+                    "Terlalu banyak buku cetak gratis yang dibagikan",
+                    "Koneksi internet terlalu cepat tanpa hambatan",
+                    "Tidak ada materi pelajaran sama sekali"
+                ],
+                correct: 0
+            },
+            {
+                question: "Di kelas manakah penulis proyek Favian Zufar Niardi menempuh pendidikan?",
+                options: [
+                    "XI TKJT 1",
+                    "X TKJ 2",
+                    "XII RPL 3",
+                    "XI Multimedia 2"
+                ],
+                correct: 0
+            }
+        ];
+
+        // State Aplikasi
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswersCount = 0;
+        let incorrectAnswersCount = 0;
+        let answeredCurrent = false;
+
+        // Elemen DOM
+        const viewInitial = document.getElementById('view-initial');
+        const viewQuiz = document.getElementById('view-quiz');
+        const viewResult = document.getElementById('view-result');
+        
+        const questionCounter = document.getElementById('question-counter');
+        const currentScoreEl = document.getElementById('current-score');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const navContainer = document.getElementById('nav-container');
+        
+        const finalScoreEl = document.getElementById('final-score');
+        const correctCountEl = document.getElementById('correct-count');
+        const incorrectCountEl = document.getElementById('incorrect-count');
+        const motivationMessage = document.getElementById('motivation-message');
+
+        // Trigger: Memulai Kuis (Dari Initial State ke Quiz State)
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswersCount = 0;
+            incorrectAnswersCount = 0;
+            
+            viewInitial.classList.add('hidden');
+            viewResult.classList.add('hidden');
+            viewQuiz.classList.remove('hidden');
+            
+            loadQuestion();
+        }
+
+        // Action: Memuat Soal ke Antarmuka
+        function loadQuestion() {
+            answeredCurrent = false;
+            navContainer.classList.add('hidden');
+            
+            const currentData = quizData[currentQuestionIndex];
+            questionCounter.textContent = `Soal ${currentQuestionIndex + 1} dari ${quizData.length}`;
+            currentScoreEl.textContent = score;
+            questionText.textContent = currentData.question;
+            
+            optionsContainer.innerHTML = '';
+            currentData.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'w-full text-left p-3.5 rounded-lg bg-white hover:bg-zinc-50 border border-zinc-200 hover:border-zinc-300 text-zinc-800 text-xs sm:text-sm font-medium transition-all duration-150 cursor-pointer flex items-center justify-between group shadow-xs';
+                button.innerHTML = `
+                    <span class="flex items-center gap-3">
+                        <span class="w-6 h-6 rounded-md bg-zinc-100 border border-zinc-200 flex items-center justify-center text-[11px] font-semibold text-zinc-700 group-hover:bg-zinc-900 group-hover:text-white transition-colors">${String.fromCharCode(65 + index)}</span>
+                        <span>${option}</span>
+                    </span>
+                `;
+                button.onclick = () => selectAnswer(index, button);
+                optionsContainer.appendChild(button);
+            });
+        }
+
+        // Action: Memeriksa Kebenaran Jawaban & Kalkulasi Skor Real-Time
+        function selectAnswer(selectedIndex, selectedButton) {
+            if (answeredCurrent) return;
+            answeredCurrent = true;
+
+            const currentData = quizData[currentQuestionIndex];
+            const allOptionButtons = optionsContainer.getElementsByTagName('button');
+
+            for (let btn of allOptionButtons) {
+                btn.disabled = true;
+                btn.classList.add('cursor-not-allowed', 'opacity-75');
+            }
+
+            if (selectedIndex === currentData.correct) {
+                score += 20;
+                correctAnswersCount++;
+                selectedButton.className = 'w-full text-left p-3.5 rounded-lg bg-zinc-900 border border-zinc-900 text-white text-xs sm:text-sm font-medium flex items-center justify-between shadow-xs transition-all';
+                selectedButton.innerHTML += `<svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`;
+            } else {
+                incorrectAnswersCount++;
+                selectedButton.className = 'w-full text-left p-3.5 rounded-lg bg-zinc-100 border border-zinc-300 text-zinc-900 text-xs sm:text-sm font-medium flex items-center justify-between shadow-xs transition-all';
+                selectedButton.innerHTML += `<svg class="w-4 h-4 text-zinc-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+
+                const correctBtn = allOptionButtons[currentData.correct];
+                correctBtn.className = 'w-full text-left p-3.5 rounded-lg bg-zinc-900 border border-zinc-900 text-white text-xs sm:text-sm font-medium flex items-center justify-between shadow-xs';
+            }
+
+            currentScoreEl.textContent = score;
+            navContainer.classList.remove('hidden');
+        }
+
+        // Trigger / Action: Melanjutkan Soal Berikutnya atau Terminasi
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // Termination State: Menampilkan Hasil Akhir & Statistik
+        function showResult() {
+            viewQuiz.classList.add('hidden');
+            viewResult.classList.remove('hidden');
+
+            finalScoreEl.textContent = score;
+            correctCountEl.textContent = correctAnswersCount;
+            incorrectCountEl.textContent = incorrectAnswersCount;
+
+            let message = "";
+            if (score === 100) {
+                message = "Penguasaan materi Cloud Computing dan kuis Anda sangat sempurna.";
+            } else if (score >= 60) {
+                message = "Pemahaman materi sudah baik, tingkatkan lagi latihan mandiri Anda.";
+            } else {
+                message = "Pelajari kembali materinya dan coba ulangi kuis untuk hasil lebih optimal.";
+            }
+            motivationMessage.textContent = message;
+        }
+
+        // Trigger: Mengulangi Kuis
+        function restartQuiz() {
+            startQuiz();
+        }
+    </script>
+</body>
+</html>
